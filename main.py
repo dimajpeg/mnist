@@ -2,7 +2,7 @@
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout # Додали імпорти для моделі
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -120,3 +120,16 @@ print("\nСтруктура моделі:")
 model.summary()
 
 print("\nФормування моделі завершено.")
+
+
+# 6. КОМПІЛЯЦІЯ МОДЕЛІ НЕЙРОННОЇ МЕРЕЖІ
+print("\nКомпіляція моделі...")
+
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+print("\nКомпіляція моделі завершена.")
+
+# Наступний етап - навчання моделі
+# model.fit(...)
