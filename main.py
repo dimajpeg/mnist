@@ -1,6 +1,8 @@
 # Імпорт необхідних бібліотек
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout # Додали імпорти для моделі
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -34,24 +36,23 @@ print(f"\nМінімальне значення пікселя в x_train_orig: 
 print(f"Максимальне значення пікселя в x_train_orig: {np.max(x_train_orig)}")
 
 # 3. Візуалізація декількох прикладів зображень (з ОРИГІНАЛЬНИХ даних)
-print("\nВізуалізація прикладів зображень (до обробки):")
-num_images_to_show = 10
-plt.figure(figsize=(10, 2))
+# print("\nВізуалізація прикладів зображень (до обробки):") # Можна закоментувати, якщо вже бачили
+# num_images_to_show = 10
+# plt.figure(figsize=(10, 2))
 
-for i in range(num_images_to_show):
-    plt.subplot(1, num_images_to_show, i + 1)
-    plt.imshow(x_train_orig[i], cmap='gray') # Використовуємо x_train_orig
-    plt.title(f"Мітка: {y_train_orig[i]}")    # Використовуємо y_train_orig
-    plt.axis('off')
+# for i in range(num_images_to_show):
+#     plt.subplot(1, num_images_to_show, i + 1)
+#     plt.imshow(x_train_orig[i], cmap='gray')
+#     plt.title(f"Мітка: {y_train_orig[i]}")
+#     plt.axis('off')
 
-plt.suptitle("Приклади зображень з набору даних MNIST (навчальна вибірка, до обробки)")
-plt.tight_layout(rect=[0, 0, 1, 0.96])
-# plt.savefig("mnist_examples_before_processing.png") # Можна зберегти, якщо потрібно
-plt.show() # Показати фігуру (можна закоментувати після першого перегляду)
+# plt.suptitle("Приклади зображень з набору даних MNIST (навчальна вибірка, до обробки)")
+# plt.tight_layout(rect=[0, 0, 1, 0.96])
+# # plt.savefig("mnist_examples_before_processing.png")
+# # plt.show() # Закоментовано, щоб не блокувати виконання при кожному запуску
 
 
-# 4. === ПОПЕРЕДНЯ ОБРОБКА ДАНИХ ===
-# Тепер працюємо з копіями x_train, y_train, x_test, y_test
+# 4. ПОПЕРЕДНЯ ОБРОБКА ДАНИХ
 print("\nПопередня обробка даних...")
 
 # 4.1. Зміна форми вхідних зображень
@@ -67,22 +68,19 @@ print(f"Нова розмірність тестових зображень (x_t
 print(f"Форма вхідних даних для моделі (input_shape): {input_shape}")
 
 # 4.2. Нормалізація значень пікселів
-# Перетворюємо тип даних на float32 для нормалізації
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
-
-# Нормалізуємо значення пікселів (діапазон [0, 1])
 x_train /= 255.0
 x_test /= 255.0
 
 print(f"\nТип даних зображень після нормалізації (x_train.dtype): {x_train.dtype}")
-print(f"Мінімальне значення пікселя в x_train після нормалізації: {np.min(x_train):.4f}") # .4f для кращого форматування float
+print(f"Мінімальне значення пікселя в x_train після нормалізації: {np.min(x_train):.4f}")
 print(f"Максимальне значення пікселя в x_train після нормалізації: {np.max(x_train):.4f}")
 
 # 4.3. Перетворення міток класів у категоріальний формат (One-Hot Encoding)
 num_classes = 10
 
-print(f"\nПерші 5 міток y_train до One-Hot Encoding: {y_train[:5]}") # Використовуємо y_train (копію)
+print(f"\nПерші 5 міток y_train до One-Hot Encoding: {y_train_orig[:5]}") # Показуємо оригінальні для порівняння
 y_train = tf.keras.utils.to_categorical(y_train, num_classes)
 y_test = tf.keras.utils.to_categorical(y_test, num_classes)
 
@@ -90,3 +88,35 @@ print(f"Розмірність міток y_train після One-Hot Encoding: {
 print(f"Перша мітка y_train[0] після One-Hot Encoding (цифра {y_train_orig[0]}): {y_train[0]}")
 
 print("\nПопередня обробка даних завершена.")
+
+
+# 5. ФОРМУВАННЯ МОДЕЛІ НЕЙРОННОЇ МЕРЕЖІ
+print("\nФормування моделі нейронної мережі...")
+
+model = Sequential()
+
+# Перший згортковий блок
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Другий згортковий блок
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Шар вирівнювання
+model.add(Flatten())
+
+# Повнозв'язний шар
+model.add(Dense(128, activation='relu'))
+
+# Шар Dropout для регуляризації
+model.add(Dropout(0.5))
+
+# Вихідний повнозв'язний шар
+model.add(Dense(num_classes, activation='softmax'))
+
+# Виведемо структуру створеної моделі
+print("\nСтруктура моделі:")
+model.summary()
+
+print("\nФормування моделі завершено.")
