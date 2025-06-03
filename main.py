@@ -133,30 +133,61 @@ print("\nКомпіляція моделі завершена.")
 
 
 # 7. ТРЕНУВАННЯ МОДЕЛІ НЕЙРОННОЇ МЕРЕЖІ
-# (Включає визначення параметрів навчання)
 print("\nВизначення параметрів та тренування моделі...")
 
-# Визначення параметрів партії навчальних даних та кількості епох
 batch_size = 128
-epochs = 15 # Можеш змінити на 2, якщо викладач наполягає на "початковому значенні" з таблиці,
-            # але для демонстрації навчання 15 краще. Або почни з 2, а потім збільш.
+epochs = 15
 
 print(f"Параметри навчання: batch_size = {batch_size}, epochs = {epochs}")
 
-# Тренування моделі нейронної мережі
-# Метод fit повертає об'єкт History, який містить історію навчання
 history = model.fit(x_train, y_train,
                     batch_size=batch_size,
                     epochs=epochs,
-                    verbose=1, # verbose=1 показуватиме прогрес-бар навчання
-                    validation_data=(x_test, y_test)) # Використовуємо тестові дані для валідації
+                    verbose=1,
+                    validation_data=(x_test, y_test))
 
 print("\nТренування моделі завершено.")
-# Об'єкт 'history' тепер містить дані про втрати та точність на кожній епосі
-# для навчальної та валідаційної вибірок.
-# Ми використаємо 'history' на наступних етапах для візуалізації результатів навчання.
 
-# Наступний етап - оцінка моделі та візуалізація
-# score = model.evaluate(x_test, y_test, verbose=0)
-# print(f"\nTest loss: {score[0]}")
-# print(f"Test accuracy: {score[1]}")
+
+# 8. ОЦІНКА МОДЕЛІ НА ТЕСТОВОМУ НАБОРІ ТА ВІЗУАЛІЗАЦІЯ РЕЗУЛЬТАТІВ НАВЧАННЯ
+print("\nОцінка моделі на тестовому наборі...")
+
+score = model.evaluate(x_test, y_test, verbose=0)
+
+print(f"\nПідсумкові втрати на тестовій вибірці (Test loss): {score[0]:.4f}")
+print(f"Підсумкова точність на тестовій вибірці (Test accuracy): {score[1]:.4f}")
+
+print("\nВізуалізація результатів навчання...")
+
+plt.figure(figsize=(14, 5))
+
+# Графік функції втрат
+plt.subplot(1, 2, 1)
+plt.plot(history.history['loss'], label='Втрати на навчанні (Training Loss)')
+plt.plot(history.history['val_loss'], label='Втрати на валідації (Validation Loss)')
+plt.title('Динаміка функції втрат під час навчання')
+plt.xlabel('Епохи')
+plt.ylabel('Втрати (Loss)')
+plt.legend()
+plt.grid(True)
+
+# Графік точності
+plt.subplot(1, 2, 2)
+plt.plot(history.history['accuracy'], label='Точність на навчанні (Training Accuracy)')
+plt.plot(history.history['val_accuracy'], label='Точність на валідації (Validation Accuracy)')
+plt.title('Динаміка точності під час навчання')
+plt.xlabel('Епохи')
+plt.ylabel('Точність (Accuracy)')
+plt.legend()
+plt.grid(True)
+
+plt.suptitle('Результати навчання моделі CNN на наборі даних MNIST', fontsize=14)
+plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+# plt.savefig("training_history_loss_accuracy.png") # Розкоментуй, щоб зберегти графіки
+plt.show()
+
+print("\nОцінка та візуалізація завершені.")
+
+# Наступні етапи:
+# 9. Прогнозування номерів класів
+# 10. Звіт про якість класифікації для класів (precision, recall, f1-score)
